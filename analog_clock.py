@@ -11,6 +11,7 @@ import ctypes
 import time	# Required For Time Handling
 import math	# Rejuired For Coordinates Calculation
 from PIL import Image, ImageOps
+import platform
 
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
