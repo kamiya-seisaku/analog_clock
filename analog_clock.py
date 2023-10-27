@@ -18,12 +18,13 @@ ctypes.windll.shcore.SetProcessDpiAwareness(1)
 class main(Tkinter.Tk):
     def __init__(self):
         Tkinter.Tk.__init__(self)
-        self.x= 100 # Center Point x
-        self.y= 100 # Center Point
+        self.resolution = 800
+        self.x = self.resolution // 2
+        self.y = self.resolution // 2
         self.attributes('-alpha',0.5) #https://www.geeksforgeeks.org/transparent-window-in-tkinter/
-        self.geometry('200x200+2050+1000')
-        self.call('tk', 'scaling', 200.0)
-        self.hand_length=50	# Stick Length
+        self.geometry(f'{self.resolution}x{self.resolution}+2050+1000')
+        self.call('tk', 'scaling', self.resolution / 100.0)
+        self.hand_length = self.resolution * 0.25
         self.theme = "default"  # Add a theme attribute
         self.creating_all_function_trigger()
         self.bind('<space>', invert_canvas)
@@ -32,15 +33,15 @@ class main(Tkinter.Tk):
     def creating_all_function_trigger(self):
         self.create_canvas_for_shapes()
         self.create_background()
-        self.creating_sticks()
+        self.creating_hands()
         return
 
 	# Creating Background
     def create_background(self):
         # self.image=ImageOps.invert(Tkinter.PhotoImage(file='clock.gif'))
         self.image=Tkinter.PhotoImage(file=f'{self.theme}_clock.gif')  # theme-based background
-        self.canvas.create_image(self.x, self.y, image=self.image)
-        self.sticks=[]
+        # self.canvas.create_image(self.x, self.y, image=self.image)
+        self.hands=[]
 
         # Procedural background drawing
         color = ['red','white','white','white','white']
@@ -64,21 +65,22 @@ class main(Tkinter.Tk):
 
     def on_resize(self, event):
         pass
-        # self.canvas.delete("all")  # Delete all canvas elements
+        # self.resolution = event.width  # Update resolution
         # self.x, self.y = event.width // 2, event.height // 2  # Update center points
+        # self.hand_length = self.resolution * 0.25  # Update hand length
+        # self.canvas.delete("all")  # Delete all canvas elements
         # self.creating_all_function_trigger()  # Recreate all elements
-        # self.update_class()  # Update positions
-
-	# Creating Moving Sticks
-    def creating_sticks(self):
-        self.sticks=[]
+ 
+	# Creating Moving Hands
+    def creating_hands(self):
+        self.hands=[]
         # color = ['white','green','red']
         color = self.get_theme_colors()  # Make the stick colors theme-based
         width = [4, 4, 1]
         for i in range(3):
             # store=self.canvas.create_line(self.x, self.y,self.x+self.length,self.y+self.length,width=2, fill='red')
             store=self.canvas.create_line(self.x, self.y,self.x+self.hand_length,self.y+self.hand_length,width=width[i], fill=color[i])
-            self.sticks.append(store)
+            self.hands.append(store)
         return
 
     # New function to get theme-based colors
@@ -103,15 +105,17 @@ class main(Tkinter.Tk):
         # Changing Stick Coordinates
         for n,i in enumerate(now):
             # print(f'n:{n} i:{i}')
-            x,y=self.canvas.coords(self.sticks[n])[0:2]
+            x,y=self.canvas.coords(self.hands[n])[0:2]
             cr=[x,y]
             cr.append(len[n]*self.hand_length*math.cos(math.radians(i*6)-math.radians(90))+self.x)
             cr.append(len[n]*self.hand_length*math.sin(math.radians(i*6)-math.radians(90))+self.y)
 
-            self.canvas.coords(self.sticks[n],cr)
-            self.canvas.coords(self.sticks[n], tuple(cr))
+            self.canvas.coords(self.hands[n],cr)
+            self.canvas.coords(self.hands[n], tuple(cr))
             self.after(1000, self.update_class)  # Reschedule the method to run again after 1 second
 
+        self.after_cancel(self._job)
+        self._job = self.after(1000, self.update_class)  # Reschedule the method to run again after 1 second
         return
 
 
