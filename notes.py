@@ -1,23 +1,18 @@
-class main(Tkinter.Tk):
-    def __init__(self):
-        Tkinter.Tk.__init__(self)
-+       self.resolution = 200  # New attribute for resolution
--       self.x= 100
--       self.y= 100
-+       self.x = self.resolution // 2  # Dynamic center point x
-+       self.y = self.resolution // 2  # Dynamic center point y
-        ...
--       self.geometry('200x200+2050+1000')
-+       self.geometry(f'{self.resolution}x{self.resolution}+2050+1000')  # Dynamic geometry
--       self.call('tk', 'scaling', 200.0)
-+       self.call('tk', 'scaling', self.resolution / 100.0)  # Dynamic scaling
--       self.hand_length=50
-+       self.hand_length = self.resolution * 0.25  # Dynamic hand length
-        ...
+def update_class(self):
+    print("Updating class...")
+    now = time.localtime()
+    hour = int(time.strftime("%I", time.strptime(str(now.tm_hour), "%H"))) * 5
+    now = (hour + now.tm_min / 12, now.tm_min, now.tm_sec)
+    len = [.7, 1, 1]
 
-    def on_resize(self, event):
-+       self.resolution = event.width  # Update resolution
-+       self.x, self.y = event.width // 2, event.height // 2  # Update center points
-+       self.hand_length = self.resolution * 0.25  # Update hand length
-+       self.canvas.delete("all")  # Delete all canvas elements
-+       self.creating_all_function_trigger()  # Recreate all elements
+    for n, i in enumerate(now):
+        x, y = self.canvas.coords(self.hands[n])[0:2]
+        cr = [x, y]
+        cr.append(len[n] * self.hand_length * math.cos(math.radians(i * 6) - math.radians(90)) + self.x)
+        cr.append(len[n] * self.hand_length * math.sin(math.radians(i * 6) - math.radians(90)) + self.y)
+        self.canvas.coords(self.hands[n], tuple(cr))
+
+    if hasattr(self, '_job'):
+        self.after_cancel(self._job)
+    self._job = self.after(1000, self.update_class)
+    print("Class updated.")

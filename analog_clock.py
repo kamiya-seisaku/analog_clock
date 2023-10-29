@@ -1,6 +1,9 @@
+# analog_clock.py
 # Started from: Aman Khrweal: Analog Clock with Python
 # https://thecleverprogrammer.com/2020/05/19/analog-clock-with-python/
 # 
+# Todo: freeze issue
+# Todo: cant close
 
 try:
 	import Tkinter
@@ -94,28 +97,23 @@ class main(Tkinter.Tk):
 
 	# Function Need Regular Update
     def update_class(self):
-        now=time.localtime()
-        t = time.strptime(str(now.tm_hour), "%H")
-        # hour = int(time.strftime( "%I", t ))*5
-        hour = int(time.strftime( "%I", t ))*5
-        # hour = now.tm_hour + now.tm_min / 60
-        now=(hour+now.tm_min/12,now.tm_min,now.tm_sec)
-        len=[.7,1,1]
+        print("Updating class...")
+        now = time.localtime()
+        hour = int(time.strftime("%I", time.strptime(str(now.tm_hour), "%H"))) * 5
+        now = (hour + now.tm_min / 12, now.tm_min, now.tm_sec)
+        len = [.7, 1, 1]
 
-        # Changing Stick Coordinates
-        for n,i in enumerate(now):
-            # print(f'n:{n} i:{i}')
-            x,y=self.canvas.coords(self.hands[n])[0:2]
-            cr=[x,y]
-            cr.append(len[n]*self.hand_length*math.cos(math.radians(i*6)-math.radians(90))+self.x)
-            cr.append(len[n]*self.hand_length*math.sin(math.radians(i*6)-math.radians(90))+self.y)
-
-            self.canvas.coords(self.hands[n],cr)
+        for n, i in enumerate(now):
+            x, y = self.canvas.coords(self.hands[n])[0:2]
+            cr = [x, y]
+            cr.append(len[n] * self.hand_length * math.cos(math.radians(i * 6) - math.radians(90)) + self.x)
+            cr.append(len[n] * self.hand_length * math.sin(math.radians(i * 6) - math.radians(90)) + self.y)
             self.canvas.coords(self.hands[n], tuple(cr))
-            self.after(1000, self.update_class)  # Reschedule the method to run again after 1 second
 
-        self.after_cancel(self._job)
-        self._job = self.after(1000, self.update_class)  # Reschedule the method to run again after 1 second
+        if hasattr(self, '_job'):
+            self.after_cancel(self._job)
+        self._job = self.after(1000, self.update_class)
+        print("Class updated.")
         return
 
 
