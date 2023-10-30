@@ -15,6 +15,8 @@ import time	# Required For Time Handling
 import math	# Rejuired For Coordinates Calculation
 from PIL import Image, ImageOps
 import platform
+import win32gui
+import win32con
 
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
@@ -24,13 +26,20 @@ class main(Tkinter.Tk):
         self.resolution = 800
         self.x = self.resolution // 2
         self.y = self.resolution // 2
-        self.attributes('-alpha',0.5) #https://www.geeksforgeeks.org/transparent-window-in-tkinter/
+        self.attributes('-alpha',0.8) #https://www.geeksforgeeks.org/transparent-window-in-tkinter/
         self.geometry(f'{self.resolution}x{self.resolution}+2050+1000')
         self.call('tk', 'scaling', self.resolution / 100.0)
         self.hand_length = self.resolution * 0.25
         self.theme = "default"  # Add a theme attribute
+
+        # click through window
+        # hwnd = self.winfo_id()
+        # win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,
+        # win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_LAYERED | win32con.WS_EX_TRANSPARENT)
+
         self.creating_all_function_trigger()
         self.bind('<space>', invert_canvas)
+        self.canvas.bind("<Configure>", self.on_resize)  # Bind the resize event to on_resize method
 
     # Creating Trigger For Other Functions
     def creating_all_function_trigger(self):
@@ -61,18 +70,19 @@ class main(Tkinter.Tk):
 
 	# creating Canvas
     def create_canvas_for_shapes(self):
-        self.canvas=Tkinter.Canvas(self, bg='black')
+        self.canvas=Tkinter.Canvas(self, bg='black', highlightthickness=0)
         self.canvas.pack(expand='yes',fill='both')
-        self.canvas.bind("<Configure>", self.on_resize)  # Bind the resize event
+        self.canvas.bind("<Configure>", self.on_resize)  # Bind the resize event to on_resize method
         return
 
     def on_resize(self, event):
         pass
-        # self.resolution = event.width  # Update resolution
+        # self.resolution = min(event.width, event.height)  # Update resolution to the smaller of width and height
         # self.x, self.y = event.width // 2, event.height // 2  # Update center points
         # self.hand_length = self.resolution * 0.25  # Update hand length
         # self.canvas.delete("all")  # Delete all canvas elements
         # self.creating_all_function_trigger()  # Recreate all elements
+        # self.update_class()  # Explicitly call update_class to redraw hands
  
 	# Creating Moving Hands
     def creating_hands(self):
